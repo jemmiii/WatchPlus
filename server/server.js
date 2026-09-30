@@ -1,26 +1,29 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const dashboardRoutes = require("./routes/dashboard");
 const cors = require("cors");
+
 require("dotenv").config({ path: "../.env" });
 
 const authRoutes = require("./routes/auth");
 const monitorRoutes = require("./routes/monitors");
+const dashboardRoutes = require("./routes/dashboard");
 const { startScheduler } = require("./services/scheduler");
 
 const app = express();
 
 app.use(express.json());
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:
+      process.env.CLIENT_URL || "http://localhost:5173",
   })
 );
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/monitors", monitorRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+
 app.get("/", (req, res) => {
   res.json({
     message: "WatchPlus API is running 🚀",
@@ -46,7 +49,7 @@ mongoose
 
     await startScheduler();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   })
